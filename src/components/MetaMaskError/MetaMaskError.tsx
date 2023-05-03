@@ -1,4 +1,4 @@
-import styles from "./MetaMaskError.module.css"
+import styles from './MetaMaskError.module.css'
 
 export const MetaMaskError = () => {
 

@@ -1,5 +1,5 @@
 import './App.global.css'
-import styles from "./App.module.css"
+import styles from './App.module.css'
 
 import { Navigation } from './components/Navigation'
 import { Display } from './components/Display'
