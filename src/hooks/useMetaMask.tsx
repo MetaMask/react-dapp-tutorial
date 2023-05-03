@@ -1,21 +1,114 @@
-// imports
+import { useState, useEffect, createContext, PropsWithChildren, useContext } from 'react'
 
-// Create interface for MetaMaskData
-// Add property named wallet with typeOf `initialState`
-// Include hasProvider, error, errorMessage, isConnecting
-// We will have connectMetaMask, and clearError functions that need to be shared
+import detectEthereumProvider from '@metamask/detect-provider'
+import { formatBalance } from '@/utils'
 
-// Initialize `initialState` with empty values ([] and "")
+interface MetaMaskData {
+  wallet: typeof initialState
+  hasProvider: boolean | null
+  error: boolean
+  errorMessage: string
+  isConnecting: boolean
+  connectMetaMask: () => void
+  clearError: () => void
+}
 
-// Create MetaMaskContext using `createContext` with `MetaMaskData`
+const initialState = { accounts: [], balance: '', chainId: '' }
 
-// Create MetaMaskContextProvider
-// This will be a function that takes { children }: PropsWithChildren
-// Most of what we had in our single component can be moved here
+const MetaMaskContext = createContext<MetaMaskData>({} as MetaMaskData)
 
-// Copy over the following functions from our single component
-// `updateWallet`, `connectMetaMask`, and `clearError`
+export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
+  const [hasProvider, setHasProvider] = useState<boolean | null>(null)
+  const [wallet, setWallet] = useState(initialState)
 
-// Return MetaMaskContext provider + { children }
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
-// Define useMetaMask and return context
+  useEffect(() => {
+    const refreshAccounts = (accounts: any) => {
+      if (accounts.length > 0) {
+        updateWallet(accounts)
+      } else {
+        // if length 0, user is disconnected
+        setWallet(initialState)
+      }
+    }
+
+    const refreshChain = (chainId: any) => {
+      setWallet((wallet) => ({ ...wallet, chainId }))
+    }
+
+    const getProvider = async () => {
+      const provider = await detectEthereumProvider({ silent: true })
+      setHasProvider(Boolean(provider))
+
+      if (provider) {
+        const accounts = await window.ethereum.request(
+          { method: 'eth_accounts' }
+        )
+        refreshAccounts(accounts)
+        window.ethereum.on('accountsChanged', refreshAccounts)
+        window.ethereum.on('chainChanged', refreshChain)
+      }
+    }
+
+    getProvider()
+
+    return () => {
+      window.ethereum?.removeListener('accountsChanged', refreshAccounts)
+      window.ethereum?.removeListener('chainChanged', refreshChain)
+    }
+  }, [])
+
+  const updateWallet = async (accounts: any) => {
+    const balance = formatBalance(await window.ethereum!.request({
+      method: 'eth_getBalance',
+      params: [accounts[0], 'latest'],
+    }))
+    const chainId = await window.ethereum!.request({
+      method: 'eth_chainId',
+    })
+    setWallet({ accounts, balance, chainId })
+  }
+
+  const connectMetaMask = async () => {
+    setIsConnecting(true)
+    await window.ethereum.request({
+      method: 'eth_requestAccounts',
+    })
+      .then((accounts: []) => {
+        setErrorMessage('')
+        updateWallet(accounts)
+      })
+      .catch((err: any) => {
+        setErrorMessage(err.message)
+      })
+    setIsConnecting(false)
+  }
+
+  const clearError = () => setErrorMessage('')
+
+  return (
+    <MetaMaskContext.Provider
+      value={{
+        wallet,
+        hasProvider,
+        error: !!errorMessage,
+        errorMessage,
+        isConnecting,
+        connectMetaMask: connectMetaMask,
+        clearError
+      }}
+    >
+      {children}
+    </MetaMaskContext.Provider>
+  )
+}
+
+export const useMetaMask = () => {
+  const context = useContext(MetaMaskContext)
+  if (context === undefined) {
+    throw new Error('useMetaMask must be used within a "MetaMaskContextProvider"')
+  }
+  return context
+}
