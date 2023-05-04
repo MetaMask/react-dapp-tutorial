@@ -1,5 +1,5 @@
-import { useMetaMask } from '@/hooks/useMetaMask'
-import { formatAddress } from '@/utils'
+import { useMetaMask } from '~/hooks/useMetaMask'
+import { formatAddress } from '~/utils'
 import styles from './Navigation.module.css'
 
 export const Navigation = () => {
