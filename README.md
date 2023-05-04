@@ -51,7 +51,7 @@ Open the project in your code editor of choice. We will reset the `App.tsx` page
 
 Update `App.tsx` to:
 
-```ts
+```tsx
 import './App.css'
 
 const App = () => {
@@ -102,7 +102,7 @@ Detecting the injected provider that browser extension wallets use is fairly str
 
 Update the `src/App.tsx` as follows:
 
-```ts
+```tsx
 import './App.css'
 let injectedProvider = false
 
@@ -250,7 +250,7 @@ Thinking ahead, we know that once we are tracking more than just `accounts`, we 
 
 Let's update our `src/App.tsx` with some added logic to our `useEffect`:
 
-```ts
+```tsx
 import './App.css'
 import { useState, useEffect } from 'react'
 import detectEthereumProvider from '@metamask/detect-provider'
@@ -336,7 +336,7 @@ To update our current component for displaying the connected address's balance a
 
 Finally, we need to parse the returned value of the balance and format it into a human-readable string. We'll create a function called `formatBalance` as well.
 
-```ts
+```tsx
 import './App.css'
 import { useState, useEffect } from 'react'
 import { formatBalance, formatChainAsNum } from './utils'  /* New */

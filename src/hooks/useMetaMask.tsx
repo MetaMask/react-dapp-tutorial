@@ -3,8 +3,14 @@ import { useState, useEffect, createContext, PropsWithChildren, useContext } fro
 import detectEthereumProvider from '@metamask/detect-provider'
 import { formatBalance } from '@/utils'
 
+interface WalletState {
+  accounts: any[]
+  balance: string
+  chainId: string
+}
+
 interface MetaMaskData {
-  wallet: typeof initialState
+  wallet: WalletState
   hasProvider: boolean | null
   error: boolean
   errorMessage: string
@@ -13,84 +19,78 @@ interface MetaMaskData {
   clearError: () => void
 }
 
-const initialState = { accounts: [], balance: '', chainId: '' }
+const disconnectedState: WalletState = { accounts: [], balance: '', chainId: '' }
 
 const MetaMaskContext = createContext<MetaMaskData>({} as MetaMaskData)
 
 export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null)
-  const [wallet, setWallet] = useState(initialState)
 
   const [isConnecting, setIsConnecting] = useState(false)
+
   const [errorMessage, setErrorMessage] = useState('')
+  const clearError = () => setErrorMessage('')
+
+  const [wallet, setWallet] = useState(disconnectedState)
+  const _updateWallet = async (providedAccounts?: any) => {
+    const accounts = providedAccounts || await window.ethereum.request(
+      { method: 'eth_accounts' }
+    )
+
+    if (accounts.length === 0) {
+      // if there are no accounts, then the user is disconnected
+      setWallet(disconnectedState)
+      return
+    }
+
+    const balance = formatBalance(await window.ethereum.request({
+      method: 'eth_getBalance',
+      params: [accounts[0], 'latest'],
+    }))
+    const chainId = await window.ethereum.request({
+      method: 'eth_chainId',
+    })
+
+    setWallet({ accounts, balance, chainId })
+  }
+
+  const updateWalletAndAccounts = () => _updateWallet()
+  const updateWallet = (accounts: any) => _updateWallet(accounts)
 
   useEffect(() => {
-    const refreshAccounts = (accounts: any) => {
-      if (accounts.length > 0) {
-        updateWallet(accounts)
-      } else {
-        // if length 0, user is disconnected
-        setWallet(initialState)
-      }
-    }
-
-    const refreshChain = async (chainId: any) => {
-      const accounts = await window.ethereum.request(
-        { method: 'eth_accounts' }
-      )
-      refreshAccounts(accounts)
-      setWallet((wallet) => ({ ...wallet, chainId }))
-    }
-
     const getProvider = async () => {
       const provider = await detectEthereumProvider({ silent: true })
       setHasProvider(Boolean(provider))
 
       if (provider) {
-        const accounts = await window.ethereum.request(
-          { method: 'eth_accounts' }
-        )
-        refreshAccounts(accounts)
-        window.ethereum.on('accountsChanged', refreshAccounts)
-        window.ethereum.on('chainChanged', refreshChain)
+        updateWalletAndAccounts();
+        window.ethereum.on('accountsChanged', updateWallet)
+        window.ethereum.on('chainChanged', updateWalletAndAccounts)
       }
     }
 
     getProvider()
 
     return () => {
-      window.ethereum?.removeListener('accountsChanged', refreshAccounts)
-      window.ethereum?.removeListener('chainChanged', refreshChain)
+      window.ethereum?.removeListener('accountsChanged', updateWallet)
+      window.ethereum?.removeListener('chainChanged', updateWalletAndAccounts)
     }
   }, [])
 
-  const updateWallet = async (accounts: any) => {
-    const balance = formatBalance(await window.ethereum!.request({
-      method: 'eth_getBalance',
-      params: [accounts[0], 'latest'],
-    }))
-    const chainId = await window.ethereum!.request({
-      method: 'eth_chainId',
-    })
-    setWallet({ accounts, balance, chainId })
-  }
-
   const connectMetaMask = async () => {
     setIsConnecting(true)
-    await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    })
-      .then((accounts: []) => {
-        setErrorMessage('')
-        updateWallet(accounts)
+
+    try {
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
       })
-      .catch((err: any) => {
-        setErrorMessage(err.message)
-      })
+      clearError()
+      updateWallet(accounts)
+    } catch(err: any) {
+      setErrorMessage(err.message)
+    }
     setIsConnecting(false)
   }
-
-  const clearError = () => setErrorMessage('')
 
   return (
     <MetaMaskContext.Provider
