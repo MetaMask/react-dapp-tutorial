@@ -10,7 +10,7 @@ interface WalletState {
   chainId: string
 }
 
-interface MetaMaskData {
+interface MetaMaskContextData {
   wallet: WalletState
   hasProvider: boolean | null
   error: boolean
@@ -22,7 +22,7 @@ interface MetaMaskData {
 
 const disconnectedState: WalletState = { accounts: [], balance: '', chainId: '' }
 
-const MetaMaskContext = createContext<MetaMaskData>({} as MetaMaskData)
+const MetaMaskContext = createContext<MetaMaskContextData>({} as MetaMaskContextData)
 
 export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null)
@@ -33,13 +33,14 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const clearError = () => setErrorMessage('')
 
   const [wallet, setWallet] = useState(disconnectedState)
+  // useCallback ensures that we don't uselessly re-create the _updateWallet function on every render
   const _updateWallet = useCallback(async (providedAccounts?: any) => {
     const accounts = providedAccounts || await window.ethereum.request(
       { method: 'eth_accounts' },
     )
 
     if (accounts.length === 0) {
-      // if there are no accounts, then the user is disconnected
+      // If there are no accounts, then the user is disconnected
       setWallet(disconnectedState)
       return
     }
@@ -58,6 +59,12 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const updateWalletAndAccounts = useCallback(() => _updateWallet(), [_updateWallet])
   const updateWallet = useCallback((accounts: any) => _updateWallet(accounts), [_updateWallet])
 
+  /**
+   * This logic checks if MetaMask is installed. If it is, then we setup some
+   * event handlers to update the wallet state when MetaMask changes. The function
+   * returned from useEffect is used as a "clean-up": in there, we remove the event
+   * handlers whenever the MetaMaskProvider is unmounted.
+   */
   useEffect(() => {
     const getProvider = async () => {
       const provider = await detectEthereumProvider({ silent: true })
