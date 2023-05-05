@@ -1,4 +1,4 @@
-import { useMetaMask } from '@/hooks/useMetaMask'
+import { useMetaMask } from '~/hooks/useMetaMask'
 import styles from './MetaMaskError.module.css'
 
 export const MetaMaskError = () => {
