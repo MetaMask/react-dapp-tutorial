@@ -12,7 +12,7 @@ export const Navigation = () => {
         <div className={styles.leftNav}>Vite + React & MetaMask</div>
         <div className={styles.rightNav}>
           {!hasProvider &&
-            <a href="https://metamask.io" target="_blank">
+            <a href="https://metamask.io" target="_blank" rel="noreferrer">
               Install MetaMask
             </a>
           }
@@ -26,7 +26,7 @@ export const Navigation = () => {
               className="text_link tooltip-bottom"
               href={`https://etherscan.io/address/${wallet}`}
               target="_blank"
-              data-tooltip="Open in Block Explorer"
+              data-tooltip="Open in Block Explorer" rel="noreferrer"
             >
               {formatAddress(wallet.accounts[0])}
             </a>

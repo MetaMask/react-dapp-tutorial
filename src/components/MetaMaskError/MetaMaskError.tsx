@@ -8,10 +8,10 @@ export const MetaMaskError = () => {
       error ? { backgroundColor: 'brown' } : {}
     }>
       { error && (
-          <div onClick={clearError}>
-            <strong>Error:</strong> {errorMessage}
-          </div>
-        )
+        <div onClick={clearError}>
+          <strong>Error:</strong> {errorMessage}
+        </div>
+      )
       }
     </div>
   )

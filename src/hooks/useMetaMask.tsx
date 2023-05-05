@@ -1,4 +1,5 @@
-import { useState, useEffect, createContext, PropsWithChildren, useContext } from 'react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useEffect, createContext, PropsWithChildren, useContext, useCallback } from 'react'
 
 import detectEthereumProvider from '@metamask/detect-provider'
 import { formatBalance } from '~/utils'
@@ -32,9 +33,9 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
   const clearError = () => setErrorMessage('')
 
   const [wallet, setWallet] = useState(disconnectedState)
-  const _updateWallet = async (providedAccounts?: any) => {
+  const _updateWallet = useCallback(async (providedAccounts?: any) => {
     const accounts = providedAccounts || await window.ethereum.request(
-      { method: 'eth_accounts' }
+      { method: 'eth_accounts' },
     )
 
     if (accounts.length === 0) {
@@ -52,10 +53,10 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     })
 
     setWallet({ accounts, balance, chainId })
-  }
+  }, [])
 
-  const updateWalletAndAccounts = () => _updateWallet()
-  const updateWallet = (accounts: any) => _updateWallet(accounts)
+  const updateWalletAndAccounts = useCallback(() => _updateWallet(), [_updateWallet])
+  const updateWallet = useCallback((accounts: any) => _updateWallet(accounts), [_updateWallet])
 
   useEffect(() => {
     const getProvider = async () => {
@@ -63,7 +64,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       setHasProvider(Boolean(provider))
 
       if (provider) {
-        updateWalletAndAccounts();
+        updateWalletAndAccounts()
         window.ethereum.on('accountsChanged', updateWallet)
         window.ethereum.on('chainChanged', updateWalletAndAccounts)
       }
@@ -75,7 +76,7 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
       window.ethereum?.removeListener('accountsChanged', updateWallet)
       window.ethereum?.removeListener('chainChanged', updateWalletAndAccounts)
     }
-  }, [])
+  }, [updateWallet, updateWalletAndAccounts])
 
   const connectMetaMask = async () => {
     setIsConnecting(true)
@@ -100,8 +101,8 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
         error: !!errorMessage,
         errorMessage,
         isConnecting,
-        connectMetaMask: connectMetaMask,
-        clearError
+        connectMetaMask,
+        clearError,
       }}
     >
       {children}
