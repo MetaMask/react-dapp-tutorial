@@ -81,8 +81,11 @@ export const MetaMaskContextProvider = ({ children }: PropsWithChildren) => {
     setIsConnecting(true)
 
     try {
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      })
       clearError()
-      updateWalletAndAccounts()
+      updateWallet(accounts)
     } catch(err: any) {
       setErrorMessage(err.message)
     }
