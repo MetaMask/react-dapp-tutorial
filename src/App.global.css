@@ -3,8 +3,8 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  /* color-scheme: light dark; */
+  /* color: rgba(255, 255, 255, 0.87); */
   background-color: #242424;
 
   font-synthesis: none;
@@ -35,7 +35,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+button.myui {
   color: #2bf9f9;
   padding: 0.3em 0.7em;
   font-size: 1em;
@@ -47,12 +47,12 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
+button.myui:hover {
   color: #f189fe;
   border-color: #f189fe;
 }
-button:focus,
-button:focus-visible {
+button.myui:focus,
+button.myui:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
