@@ -1,19 +1,24 @@
-import { useMetaMask } from '~/hooks/useMetaMask'
-import { formatChainAsNum } from '~/utils'
+// import { useMetaMask } from '~/hooks/useMetaMask'
+import { useSDK } from '@metamask/sdk-react'
 import styles from './Display.module.css'
+import { formatChainAsNum } from '~/utils'
 
 export const Display = () => {
 
-  const { wallet } = useMetaMask()
+  // const { wallet } = useMetaMask()
+  const { connected, account, provider } = useSDK()
 
   return (
     <div className={styles.display}>
-      {wallet.accounts.length > 0 &&
+      {connected &&
         <>
-          <div>Wallet Accounts: {wallet.accounts[0]}</div>
-          <div>Wallet Balance: {wallet.balance}</div>
-          <div>Hex ChainId: {wallet.chainId}</div>
-          <div>Numeric ChainId: {formatChainAsNum(wallet.chainId)}</div>
+          <div>Wallet Accounts: {account}</div>
+          {provider && provider.chainId &&
+            <>
+              <div>Hex ChainId: {provider?.chainId}</div>
+              <div>Numeric ChainId: {formatChainAsNum(provider?.chainId)}</div>
+            </>
+          }
         </>
       }
     </div>

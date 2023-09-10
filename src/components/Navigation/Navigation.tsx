@@ -1,17 +1,33 @@
-import { useMetaMask } from '~/hooks/useMetaMask'
+// import { useMetaMask } from '~/hooks/useMetaMask'
 import { formatAddress } from '~/utils'
 import styles from './Navigation.module.css'
 
+/* ADDED */
+import { useState } from 'react'
+import { useSDK } from '@metamask/sdk-react'
+
 export const Navigation = () => {
 
-  const { wallet, hasProvider, isConnecting, connectMetaMask } = useMetaMask()
+  // const { wallet, hasProvider, isConnecting, connectMetaMask } = useMetaMask()
+
+  const [account, setAccount] = useState<string>()
+  const { sdk, connected, connecting } = useSDK()
+
+  const connect = async () => {
+    try {
+      const accounts = await sdk?.connect()
+      setAccount(accounts?.[0])
+    } catch (err) {
+      console.warn(`failed to connect..`, err)
+    }
+  }
 
   return (
     <div className={styles.navigation}>
       <div className={styles.flexContainer}>
         <div className={styles.leftNav}>Vite + React & MetaMask</div>
         <div className={styles.rightNav}>
-          {!hasProvider &&
+          {/* {!hasProvider &&
             <a href="https://metamask.io" target="_blank" rel="noreferrer">
               Install MetaMask
             </a>
@@ -30,6 +46,20 @@ export const Navigation = () => {
             >
               {formatAddress(wallet.accounts[0])}
             </a>
+          } */}
+
+          {connected
+            ? <a
+              className="text_link tooltip-bottom"
+              href={`https://etherscan.io/address/${account}`}
+              target="_blank"
+              data-tooltip="Open in Block Explorer" rel="noreferrer"
+            >
+              {formatAddress(account)}
+            </a>
+            : <button className="myui" disabled={connecting} onClick={connect}>
+              Connect MetaMask
+            </button>
           }
         </div>
       </div>
