@@ -1,12 +1,12 @@
 // import { useMetaMask } from '~/hooks/useMetaMask'
-import { useSDK } from '@metamask/sdk-react'
+import { useSDK } from '@metamask/sdk-react-ui'
 import styles from './Display.module.css'
 import { formatChainAsNum } from '~/utils'
 
 export const Display = () => {
 
   // const { wallet } = useMetaMask()
-  const { connected, account, provider } = useSDK()
+  const { account, connected, provider } = useSDK()
 
   return (
     <div className={styles.display}>

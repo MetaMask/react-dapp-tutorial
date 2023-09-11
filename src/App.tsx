@@ -8,18 +8,18 @@ import { MetaMaskError } from './components/MetaMaskError'
 import { MetaMaskUIProvider } from '@metamask/sdk-react-ui'
 
 export const App = () => {
+  const sdkOptions = {
+    logging: { developerMode: false },
+    checkInstallationImmediately: false, // This will automatically connect to MetaMask on page load
+    dappMetadata: {
+      name: 'Demo React App',
+      url: window.location.host,
+    },
+    chainId: '0x89',
+  }
 
   return (
-    <MetaMaskUIProvider sdkOptions={{
-      logging: {
-        developerMode: false,
-      },
-      checkInstallationImmediately: false, // This will automatically connect to MetaMask on page load
-      dappMetadata: {
-        name: 'Demo React App',
-        url: window.location.host,
-      },
-    }}>
+    <MetaMaskUIProvider sdkOptions={sdkOptions}>
       <div className={styles.appContainer}>
         <Navigation />
         <Display />
