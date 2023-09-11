@@ -11,10 +11,7 @@
     "lint:fix": "npm run lint --fix"
   },
   "dependencies": {
-    "@metamask/detect-provider": "^2.0.0",
-    "@metamask/sdk": "^0.6.1",
-    "@metamask/sdk-react": "^0.6.1",
-    "@metamask/sdk-react-ui": "^0.6.1",
+    "@metamask/sdk-react": "^0.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
