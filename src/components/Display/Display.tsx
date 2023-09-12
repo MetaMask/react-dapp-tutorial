@@ -1,11 +1,9 @@
-// import { useMetaMask } from '~/hooks/useMetaMask'
 import { useSDK } from '@metamask/sdk-react'
 import styles from './Display.module.css'
 import { formatChainAsNum } from '~/utils'
 
 export const Display = () => {
 
-  // const { wallet } = useMetaMask()
   const { connected, account, provider } = useSDK()
 
   return (

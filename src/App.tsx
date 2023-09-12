@@ -3,7 +3,6 @@ import styles from './App.module.css'
 
 import { Navigation } from './components/Navigation'
 import { Display } from './components/Display'
-import { MetaMaskError } from './components/MetaMaskError'
 
 import { MetaMaskProvider } from '@metamask/sdk-react'
 
@@ -23,7 +22,6 @@ export const App = () => {
       <div className={styles.appContainer}>
         <Navigation />
         <Display />
-        <MetaMaskError />
       </div>
     </MetaMaskProvider>
   )

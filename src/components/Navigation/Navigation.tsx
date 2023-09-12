@@ -1,4 +1,3 @@
-// import { useMetaMask } from '~/hooks/useMetaMask'
 import { formatAddress } from '~/utils'
 import styles from './Navigation.module.css'
 
@@ -7,8 +6,6 @@ import { useState } from 'react'
 import { useSDK } from '@metamask/sdk-react'
 
 export const Navigation = () => {
-
-  // const { wallet, hasProvider, isConnecting, connectMetaMask } = useMetaMask()
 
   const [account, setAccount] = useState<string>()
   const { sdk, connected, connecting } = useSDK()
