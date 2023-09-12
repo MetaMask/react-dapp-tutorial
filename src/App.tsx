@@ -3,7 +3,7 @@ import styles from './App.module.css'
 
 import { Navigation } from './components/Navigation'
 import { Display } from './components/Display'
-import { MetaMaskError } from './components/MetaMaskError'
+// import { MetaMaskError } from './components/MetaMaskError'
 // import { MetaMaskContextProvider } from './hooks/useMetaMask'
 import { MetaMaskUIProvider } from '@metamask/sdk-react-ui'
 

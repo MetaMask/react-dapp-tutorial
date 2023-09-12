@@ -15,3 +15,8 @@ Ensure you have the following before starting this tutorial.
 ## Resources for this Branch
 
 You can see the companion tutorial at [docs.metamask.io/wallet/tutorials/react-dapp-global-state](https://docs.metamask.io/wallet/tutorials/react-dapp-global-state)
+
+## Branches 
+
+- sdk-use-state
+- sdk-use-react-ui
